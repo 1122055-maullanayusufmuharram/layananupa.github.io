@@ -472,8 +472,8 @@
 </footer>
 
 <script>
-// URL Web App Apps Script Anda
-const scriptURL = 'https://script.google.com/macros/s/AKfycbyHPWS42pDCbKT5q-80WzwGNinn4SFc3Tz51IKn9iJofq322ap5k745QU7HntiuYvvK/exec';
+// URL Web App Apps Script Hasil Deploy Terbaru
+const scriptURL = 'https://script.google.com/macros/s/AKfycbyLHpuIbdofh7gWEWTjaJr7HwIazcZPoJWCG_wTLHBqaFKqVmAFIU75SYeM_khSSESN/exec';
 
 function checkIsMobile() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -771,28 +771,22 @@ function submitForm(){
     keperluan: keperluan
   };
 
-  // Menggunakan timeout & penanganan no-cors yang aman agar tidak stuck di loading
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 7000);
-
+  // Menggunakan header text/plain dan mode no-cors agar aman dari blokir CORS Google Apps Script
   fetch(scriptURL, {
     method: 'POST',
     mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-    signal: controller.signal
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
   })
   .then(() => {
-    clearTimeout(timeoutId);
     loadingModal.style.display = 'none';
     btn.disabled = false;
     showConfirm(nama);
   })
-  .catch(() => {
-    clearTimeout(timeoutId);
+  .catch((err) => {
+    console.error('Submit error:', err);
     loadingModal.style.display = 'none';
     btn.disabled = false;
-    // Karena mode no-cors terkadang melempar error meskipun data sukses terkirim, kita tetap arahkan ke sukses
     showConfirm(nama);
   });
 }
