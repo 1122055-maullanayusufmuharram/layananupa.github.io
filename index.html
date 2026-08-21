@@ -472,6 +472,9 @@
 </footer>
 
 <script>
+// URL Web App Apps Script Anda
+const scriptURL = 'https://script.google.com/macros/s/AKfycbyHPWS42pDCbKT5q-80WzwGNinn4SFc3Tz51IKn9iJofq322ap5k745QU7HntiuYvvK/exec';
+
 function checkIsMobile() {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('mode') === 'mobile' || window.innerWidth < 768;
@@ -610,9 +613,6 @@ function initApp() {
   }
 }
 
-/* =========================================================
-   ADAPTIVE CLOCK ENGINE (10s DI MOBILE, 1s DI DESKTOP)
-========================================================= */
 function updateClocks(){
   const now = new Date();
   const hours = String(now.getHours()).padStart(2, '0');
@@ -725,7 +725,6 @@ function selectService(service){
   
   showScreen('formScreen');
   
-  // Reset posisi scroll internal main container saat pindah form
   const formMain = document.querySelector('#formScreen main');
   if (formMain) formMain.scrollTop = 0;
 }
@@ -760,24 +759,35 @@ function submitForm(){
   loadingModal.style.display = 'flex';
   btn.disabled = true;
 
-  google.script.run
-    .withSuccessHandler(res => {
-      loadingModal.style.display = 'none';
-      btn.disabled = false;
-      if (!res.success) {
-        errorMsg.textContent = 'Gagal menyimpan: ' + res.error;
-        errorMsg.style.display = 'block';
-        return;
-      }
-      showConfirm(res.namaLengkap);
-    })
-    .withFailureHandler(() => {
-      loadingModal.style.display = 'none';
-      btn.disabled = false;
-      errorMsg.textContent = 'Terjadi kesalahan sistem. Coba lagi.';
-      errorMsg.style.display = 'block';
-    })
-    .submitLayanan({ namaLengkap: nama, npm: npm, noWa: noWa, fakultas: fakultas, bahasaPelatihan: bahasaPelatihan, namaPelatihan: namaPelatihan, tglLahir: tglLahir, tglTest: tglTest, keperluan: keperluan });
+  const payload = {
+    namaLengkap: nama,
+    npm: npm,
+    noWa: noWa,
+    fakultas: fakultas,
+    bahasaPelatihan: bahasaPelatihan,
+    namaPelatihan: namaPelatihan,
+    tglLahir: tglLahir,
+    tglTest: tglTest,
+    keperluan: keperluan
+  };
+
+  fetch(scriptURL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(() => {
+    loadingModal.style.display = 'none';
+    btn.disabled = false;
+    showConfirm(nama);
+  })
+  .catch(() => {
+    loadingModal.style.display = 'none';
+    btn.disabled = false;
+    errorMsg.textContent = 'Terjadi kesalahan sistem. Coba lagi.';
+    errorMsg.style.display = 'block';
+  });
 }
 
 function showConfirm(nama){
